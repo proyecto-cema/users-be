@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users-be
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5 
+  template:
+    metadata:
+      labels:
+        app: users-be
+    spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
+      containers:
+      - name: users-be
+        image: cemaregistry.azurecr.io/cema/users-be:$VERSION
+        ports:
+        - containerPort: 30023
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 250m
+          limits:
+            cpu: 500m
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: $ENV
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-be
+spec:
+  type: NodePort
+  ports:
+  - port: 30023
+    nodePort: 30023
+  selector:
+    app: users-be

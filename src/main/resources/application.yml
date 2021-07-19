@@ -9,6 +9,7 @@ logging:
   level:
     com:
       cema: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 app:
   region: AR
 
@@ -27,6 +28,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/users
     username: users
     password: m4_@96_+r2bF+Ad7
+
+
 
 ---
 spring:

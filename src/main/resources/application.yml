@@ -4,16 +4,27 @@ info:
     
 server:
     port: 30023
+    ssl:
+      key-store: classpath:cema.jks
+      key-store-password: slipknot
+      key-store-type: jks
+      key-alias: proyecto-cema.com
+      key-password: slipknot
     
 logging:
   level:
-    com:
-      cema: DEBUG
+    ROOT: INFO
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
 app:
   region: AR
 
 spring:
+  security:
+
+    user:
+      name: cema
+      password: cema
+      roles: user, admin
   profiles:
     active: local
   application:

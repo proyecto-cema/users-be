@@ -29,7 +29,8 @@ spring:
     username: users
     password: m4_@96_+r2bF+Ad7
 
-
+jwt:
+  secret: cema
 
 ---
 spring:

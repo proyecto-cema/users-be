@@ -4,20 +4,33 @@ package com.cema.users.mapping.impl;
 import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
 import com.cema.users.mapping.UserMapping;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.util.DigestUtils;
+import org.mockito.Mock;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.openMocks;
 
 class UserMappingImplTest {
 
-    private UserMapping userMapping = new UserMappingImpl();
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    private UserMapping userMapping;
+
+    @BeforeEach
+    public void setUp() {
+        openMocks(this);
+        userMapping = new UserMappingImpl(passwordEncoder);
+    }
 
     @Test
-    public void mapEntityToDomainShouldReturnCorrectDomainObject(){
+    public void mapEntityToDomainShouldReturnCorrectDomainObject() {
         String userName = "userName";
         String name = "name";
         String lastName = "lastName";
@@ -46,7 +59,7 @@ class UserMappingImplTest {
     }
 
     @Test
-    public void mapDomainToEntityShouldReturnCorrectEntityObject(){
+    public void mapDomainToEntityShouldReturnCorrectEntityObject() {
         String userName = "userName";
         String name = "name";
         String lastName = "lastName";
@@ -54,7 +67,9 @@ class UserMappingImplTest {
         String phone = "phone";
         String email = "email";
         String password = "password";
-        String hashedPassword = DigestUtils.md5DigestAsHex(password.getBytes());
+        String hashedPassword = "hashed";
+
+        when(passwordEncoder.encode(password)).thenReturn(hashedPassword);
 
         User user = new User();
         user.setName(name);

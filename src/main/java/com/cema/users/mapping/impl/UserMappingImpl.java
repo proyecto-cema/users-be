@@ -3,13 +3,19 @@ package com.cema.users.mapping.impl;
 import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
 import com.cema.users.mapping.UserMapping;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 
 import java.util.Date;
 
 @Service
 public class UserMappingImpl implements UserMapping {
+
+    private final PasswordEncoder bcryptEncoder;
+
+    public UserMappingImpl(PasswordEncoder bcryptEncoder) {
+        this.bcryptEncoder = bcryptEncoder;
+    }
 
     @Override
     public User mapEntityToDomain(CemaUser cemaUser) {
@@ -35,8 +41,7 @@ public class UserMappingImpl implements UserMapping {
         cemaUser.setPhone(user.getPhone());
         cemaUser.setRole(user.getRole());
         cemaUser.setCreationDate(new Date());
-        String hashedPassword = DigestUtils.md5DigestAsHex(password.getBytes());
-        cemaUser.setPassword(hashedPassword);
+        cemaUser.setPassword(bcryptEncoder.encode(password));
 
         return cemaUser;
     }

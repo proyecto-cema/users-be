@@ -76,4 +76,17 @@ public class User {
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userName='" + userName + '\'' +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", role='" + role + '\'' +
+                ", creationDate=" + creationDate +
+                '}';
+    }
 }

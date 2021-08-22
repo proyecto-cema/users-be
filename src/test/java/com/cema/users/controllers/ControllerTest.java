@@ -2,7 +2,6 @@ package com.cema.users.controllers;
 
 import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
-import com.cema.users.exceptions.IncorrectCredentialsException;
 import com.cema.users.exceptions.UserExistsException;
 import com.cema.users.exceptions.UserNotFoundException;
 import com.cema.users.mapping.UserMapping;
@@ -69,73 +68,18 @@ public class ControllerTest {
     }
 
     @Test
-    public void loginShouldAlwaysReturnUserWhenExistsAndPasswordIsCorrect() {
-        CemaUser cemaUser = new CemaUser();
-        User user = new User();
-        String userName = "merlin";
-        String password = "password";
-        when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(cemaUser);
-        when(loginService.login(password, cemaUser)).thenReturn(true);
-        when(userMapping.mapEntityToDomain(cemaUser)).thenReturn(user);
-        Controller controller = new Controller(cemaUserRepository, userMapping, loginService);
-        ResponseEntity<User> result = controller.login(userName, password);
-        User resultingUser = result.getBody();
-
-        assertThat(resultingUser, is(user));
-        HttpStatus resultingStatus = result.getStatusCode();
-
-        assertThat(resultingStatus, is(HttpStatus.OK));
-    }
-
-    @Test
-    public void loginShouldAlwaysReturnUnauthorizedWhenPasswordIsIncorrect() {
-        CemaUser cemaUser = new CemaUser();
-        User user = new User();
-        String userName = "merlin";
-        String password = "password";
-        when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(cemaUser);
-        when(loginService.login(password, cemaUser)).thenReturn(true);
-        when(userMapping.mapEntityToDomain(cemaUser)).thenReturn(user);
-        Controller controller = new Controller(cemaUserRepository, userMapping, loginService);
-        Exception exception = assertThrows(IncorrectCredentialsException.class, () -> {
-            controller.login(userName, "otherpassword");
-        });
-        String resultingMessage = exception.getMessage();
-
-        assertThat(resultingMessage, is("Incorrect credentials for user merlin"));
-    }
-
-
-    @Test
-    public void loginShouldAlwaysReturnNotFoundWhenUserDoesntExists() {
-        CemaUser cemaUser = new CemaUser();
-        User user = new User();
-        String userName = "merlin";
-        String password = "password";
-        when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(cemaUser);
-        when(loginService.login(password, cemaUser)).thenReturn(true);
-        when(userMapping.mapEntityToDomain(cemaUser)).thenReturn(user);
-        Controller controller = new Controller(cemaUserRepository, userMapping, loginService);
-        Exception exception = assertThrows(UserNotFoundException.class, () -> {
-                    controller.login("otheruser", password);
-                });
-        String resultingMessage = exception.getMessage();
-
-        assertThat(resultingMessage, is("User otheruser doesn't exits"));
-    }
-
-    @Test
     public void registerShouldAlwaysReturnCreatedWhenUserAddedCorrectly() {
         CemaUser cemaUser = new CemaUser();
         User user = new User();
         String userName = "merlin";
+        user.setUserName(userName);
         String password = "password";
 
         when(loginService.login(password, cemaUser)).thenReturn(true);
         when(userMapping.mapDomainToEntity(user, userName, password)).thenReturn(cemaUser);
 
         Controller controller = new Controller(cemaUserRepository, userMapping, loginService);
-        ResponseEntity<User> result = controller.register(userName, password, user);
+        ResponseEntity<User> result = controller.register(password, user);
 
         HttpStatus resultingStatus = result.getStatusCode();
 
@@ -147,6 +91,7 @@ public class ControllerTest {
         CemaUser cemaUser = new CemaUser();
         User user = new User();
         String userName = "merlin";
+        user.setUserName(userName);
         String password = "password";
         when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(cemaUser);
         when(loginService.login(password, cemaUser)).thenReturn(true);
@@ -155,7 +100,7 @@ public class ControllerTest {
         Controller controller = new Controller(cemaUserRepository, userMapping, loginService);
 
         Exception exception = assertThrows(UserExistsException.class, () -> {
-            controller.register(userName, password, user);
+            controller.register(password, user);
         });
 
         String resultingMessage = exception.getMessage();

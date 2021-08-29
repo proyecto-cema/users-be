@@ -109,12 +109,20 @@ class AuthenticationControllerTest {
     @Test
     public void createAuthenticationTokenShouldReturnJwtResponseWithToken() {
         JwtRequest authenticationRequest = new JwtRequest();
-        String userName = "userName";
+        String userName = "username";
         String password = "password";
         authenticationRequest.setUsername(userName);
         authenticationRequest.setPassword(password);
         Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(usernamePasswordAuthenticationTokenArgumentCaptor.capture())).thenReturn(authentication);
+
+        CemaUser cemaUser = new CemaUser();
+
+        when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(cemaUser);
+
+        User user = new User();
+
+        when(userMapping.mapEntityToDomain(cemaUser)).thenReturn(user);
 
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetailsServiceImpl.loadUserByUsername(userName)).thenReturn(userDetails);
@@ -129,6 +137,7 @@ class AuthenticationControllerTest {
         JwtResponse jwtResponse = result.getBody();
 
         assertThat(jwtResponse.getToken(), is(token));
+        assertThat(jwtResponse.getUser(), is(user));
     }
 
     @Test

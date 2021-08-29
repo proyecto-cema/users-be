@@ -31,6 +31,7 @@ class UserMappingImplTest {
 
     @Test
     public void mapEntityToDomainShouldReturnCorrectDomainObject() {
+        String cuig = "cuig";
         String userName = "userName";
         String name = "name";
         String lastName = "lastName";
@@ -39,6 +40,7 @@ class UserMappingImplTest {
         String email = "email";
         Date creationDate = new Date();
         CemaUser cemaUser = new CemaUser();
+        cemaUser.setEstablishmentCuig(cuig);
         cemaUser.setUserName(userName);
         cemaUser.setName(name);
         cemaUser.setLastName(lastName);
@@ -49,6 +51,7 @@ class UserMappingImplTest {
 
         User resultUser = userMapping.mapEntityToDomain(cemaUser);
 
+        assertThat(resultUser.getEstablishmentCuig(), is(cuig));
         assertThat(resultUser.getUserName(), is(userName));
         assertThat(resultUser.getName(), is(name));
         assertThat(resultUser.getLastName(), is(lastName));
@@ -60,6 +63,7 @@ class UserMappingImplTest {
 
     @Test
     public void mapDomainToEntityShouldReturnCorrectEntityObject() {
+        String cuig = "cuig";
         String userName = "userName";
         String name = "name";
         String lastName = "lastName";
@@ -72,6 +76,7 @@ class UserMappingImplTest {
         when(passwordEncoder.encode(password)).thenReturn(hashedPassword);
 
         User user = new User();
+        user.setEstablishmentCuig(cuig);
         user.setName(name);
         user.setLastName(lastName);
         user.setRole(role);
@@ -80,6 +85,7 @@ class UserMappingImplTest {
 
         CemaUser cemaUser = userMapping.mapDomainToEntity(user, userName, password);
 
+        assertThat(cemaUser.getEstablishmentCuig(), is(cuig));
         assertThat(cemaUser.getUserName(), is(userName));
         assertThat(cemaUser.getName(), is(name));
         assertThat(cemaUser.getLastName(), is(lastName));

@@ -133,7 +133,7 @@ public class Controller {
         throw new UserNotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
     }
 
-    @ApiOperation(value = "Retrieve a list of users with the specified role", response = List.class)
+    @ApiOperation(value = "Retrieve a list of users with the specified role", response = User.class, responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully found user")
     })

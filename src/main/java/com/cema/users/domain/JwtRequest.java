@@ -1,15 +1,14 @@
 package com.cema.users.domain;
 
 import io.swagger.annotations.ApiModelProperty;
+import javax.validation.constraints.NotEmpty;
 
-import java.io.Serializable;
-
-public class JwtRequest implements Serializable {
-
-    private static final long serialVersionUID = 5926468583005150707L;
+public class JwtRequest {
 
     @ApiModelProperty(notes = "The username for this user, needed for login", example = "merlinds")
+    @NotEmpty(message = "Username is required")
     private String username;
+    @NotEmpty(message = "Password is required")
     @ApiModelProperty(notes = "The password for this user, needed for login", example = "verysecure")
     private String password;
 

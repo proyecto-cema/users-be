@@ -1,17 +1,30 @@
 package com.cema.users.domain;
 
-import java.io.Serializable;
+import io.swagger.annotations.ApiModelProperty;
 
-public class JwtResponse implements Serializable {
-
-    private static final long serialVersionUID = -8091879091924046844L;
+public class JwtResponse {
+    @ApiModelProperty(notes = "The token representing this session")
     private final String token;
+    private User user;
 
     public JwtResponse(String token) {
         this.token = token;
     }
 
+    public JwtResponse(String token, User user) {
+        this.token = token;
+        this.user = user;
+    }
+
     public String getToken() {
         return this.token;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

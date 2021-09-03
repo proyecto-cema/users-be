@@ -13,9 +13,13 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -136,7 +140,36 @@ public class ControllerTest {
 
         String resultingMessage = exception.getMessage();
 
-        assertThat(resultingMessage, is("User otherUser doesn't exits"));
+        assertThat(resultingMessage, is("User otheruser doesn't exits"));
+    }
+
+    @Test
+    public void listUsersByRoleShouldAlwaysReturnUsersWhenExists() {
+        String role = "role";
+
+        CemaUser cemaUser1 = new CemaUser();
+        User user1 = new User();
+
+        CemaUser cemaUser2 = new CemaUser();
+        User user2 = new User();
+
+        List<CemaUser> cemaUsers = Arrays.asList(cemaUser1, cemaUser2);
+
+        when(cemaUserRepository.findCemaUsersByRole(role)).thenReturn(cemaUsers);
+        when(userMapping.mapEntityToDomain(cemaUser1)).thenReturn(user1);
+        when(userMapping.mapEntityToDomain(cemaUser2)).thenReturn(user2);
+        Controller controller = new Controller(cemaUserRepository, userMapping, loginService);
+
+
+        ResponseEntity<List<User>> result = controller.listUsersByRole(role);
+
+        List<User> resultingUsers = result.getBody();
+
+        assertTrue(resultingUsers.contains(user1));
+        assertTrue(resultingUsers.contains(user2));
+        HttpStatus resultingStatus = result.getStatusCode();
+
+        assertThat(resultingStatus, is(HttpStatus.OK));
     }
 
 }

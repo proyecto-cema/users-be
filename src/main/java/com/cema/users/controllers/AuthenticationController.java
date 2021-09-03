@@ -25,6 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,9 +34,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/v1")
 @Api(produces = "application/json", value = "Allows interaction with the users database and authorization operations. V1")
+@Validated
 public class AuthenticationController {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationController.class);
@@ -83,21 +87,24 @@ public class AuthenticationController {
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    @ApiOperation(value = "Login as a user and retrieve an auth token for further usage", response = User.class)
+    @ApiOperation(value = "Login as a user and retrieve an auth token for further usage along with the user data", response = User.class)
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully login"),
             @ApiResponse(code = 401, message = "The provided credentials are incorrect")
     })
-    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) {
-        LOG.info("Authentication request for user: {}", authenticationRequest.getUsername());
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+    public ResponseEntity<JwtResponse> createAuthenticationToken(@RequestBody @Valid JwtRequest authenticationRequest) {
+        String userName = authenticationRequest.getUsername().toLowerCase();
+        LOG.info("Authentication request for user: {}", userName);
+        authenticate(userName, authenticationRequest.getPassword());
 
+        CemaUser cemaUser = cemaUserRepository.findCemaUserByUserName(userName);
+        User user = userMapping.mapEntityToDomain(cemaUser);
         UserDetails userDetails = userDetailsServiceImpl
-                .loadUserByUsername(authenticationRequest.getUsername());
+                .loadUserByUsername(userName);
 
         String token = tokenServiceImpl.generateToken(userDetails);
         LOG.info("Returning token: {}", token);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(new JwtResponse(token, user));
     }
 
     private void authenticate(String username, String password) {

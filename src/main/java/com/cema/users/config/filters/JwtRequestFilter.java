@@ -24,9 +24,7 @@ import java.io.IOException;
 public class JwtRequestFilter extends OncePerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(JwtRequestFilter.class);
 
-
     private static final String AUTHORIZATION_HEADER = "Authorization";
-
 
     private final UserDetailsService userDetailsServiceImpl;
 
@@ -61,7 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // Once we get the token validate it.
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails userDetails = this.userDetailsServiceImpl.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
 
                 if (tokenServiceImpl.validateToken(jwtToken, userDetails)) {
 

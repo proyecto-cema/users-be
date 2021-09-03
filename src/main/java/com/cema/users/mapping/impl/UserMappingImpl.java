@@ -20,6 +20,7 @@ public class UserMappingImpl implements UserMapping {
     @Override
     public User mapEntityToDomain(CemaUser cemaUser) {
         User user = new User();
+        user.setEstablishmentCuig(cemaUser.getEstablishmentCuig());
         user.setName(cemaUser.getName());
         user.setUserName(cemaUser.getUserName());
         user.setLastName(cemaUser.getLastName());
@@ -34,6 +35,7 @@ public class UserMappingImpl implements UserMapping {
     @Override
     public CemaUser mapDomainToEntity(User user, String userName, String password) {
         CemaUser cemaUser = new CemaUser();
+        cemaUser.setEstablishmentCuig(user.getEstablishmentCuig());
         cemaUser.setName(user.getName());
         cemaUser.setUserName(userName);
         cemaUser.setLastName(user.getLastName());

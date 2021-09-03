@@ -19,6 +19,9 @@ public class CemaUser {
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "establishment_cuig")
+    private String establishmentCuig;
+
     @Column(name = "username")
     private String userName;
 
@@ -42,6 +45,14 @@ public class CemaUser {
 
     @Column(name = "creation_date")
     private Date creationDate;
+
+    public String getEstablishmentCuig() {
+        return establishmentCuig;
+    }
+
+    public void setEstablishmentCuig(String establishmentCuig) {
+        this.establishmentCuig = establishmentCuig;
+    }
 
     public Integer getId() {
         return id;

@@ -55,7 +55,7 @@ class UserDetailsServiceImplTest {
         assertThat(userDetails.getPassword(), is(password));
         Set<GrantedAuthority> grantedAuthorities = (Set<GrantedAuthority>) userDetails.getAuthorities();
 
-        assertThat(grantedAuthorities.iterator().next().getAuthority(), is(role));
+        assertThat(grantedAuthorities.iterator().next().getAuthority(), is(role.toUpperCase()));
     }
 
     @Test

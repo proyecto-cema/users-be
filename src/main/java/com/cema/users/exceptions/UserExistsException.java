@@ -1,9 +1,6 @@
 package com.cema.users.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-public class UserExistsException extends RuntimeException{
+public class UserExistsException extends RuntimeException {
 
     public UserExistsException() {
     }

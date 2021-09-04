@@ -2,13 +2,13 @@ package com.cema.users.config.filters;
 
 import com.cema.users.constants.Constants;
 import com.cema.users.services.jwt.TokenService;
+import com.cema.users.domain.CemaUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.micrometer.core.instrument.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -59,7 +59,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // Once we get the token validate it.
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                UserDetails userDetails = userDetailsServiceImpl.loadUserByUsername(username);
+                CemaUserDetails userDetails = (CemaUserDetails) userDetailsServiceImpl.loadUserByUsername(username);
 
                 if (tokenServiceImpl.validateToken(jwtToken, userDetails)) {
 

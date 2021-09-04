@@ -89,7 +89,7 @@ class UserMappingImplTest {
         assertThat(cemaUser.getUserName(), is(userName));
         assertThat(cemaUser.getName(), is(name));
         assertThat(cemaUser.getLastName(), is(lastName));
-        assertThat(cemaUser.getRole(), is(role));
+        assertThat(cemaUser.getRole(), is(role.toUpperCase()));
         assertThat(cemaUser.getEmail(), is(email));
         assertThat(cemaUser.getPhone(), is(phone));
         assertThat(cemaUser.getPassword(), is(hashedPassword));

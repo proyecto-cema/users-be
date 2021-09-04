@@ -41,7 +41,7 @@ public class UserMappingImpl implements UserMapping {
         cemaUser.setLastName(user.getLastName());
         cemaUser.setEmail(user.getEmail());
         cemaUser.setPhone(user.getPhone());
-        cemaUser.setRole(user.getRole());
+        cemaUser.setRole(user.getRole().toUpperCase());
         cemaUser.setCreationDate(new Date());
         cemaUser.setPassword(bcryptEncoder.encode(password));
 

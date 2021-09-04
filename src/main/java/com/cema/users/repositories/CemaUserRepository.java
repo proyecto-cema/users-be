@@ -11,5 +11,5 @@ public interface CemaUserRepository extends CrudRepository<CemaUser, Long> {
 
     CemaUser findCemaUserByUserName(String userName);
 
-    List<CemaUser> findCemaUsersByRole(String role);
+    List<CemaUser> findCemaUsersByRoleIgnoreCase(String role);
 }

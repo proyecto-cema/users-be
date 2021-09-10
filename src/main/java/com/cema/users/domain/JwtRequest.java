@@ -1,6 +1,7 @@
 package com.cema.users.domain;
 
 import io.swagger.annotations.ApiModelProperty;
+
 import javax.validation.constraints.NotEmpty;
 
 public class JwtRequest {
@@ -13,8 +14,7 @@ public class JwtRequest {
     private String password;
 
     //need default constructor for JSON Parsing
-    public JwtRequest()
-    {
+    public JwtRequest() {
 
     }
 

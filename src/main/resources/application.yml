@@ -7,6 +7,9 @@ server:
     
 logging:
   level:
+    org:
+      springframework:
+        security: DEBUG
     com:
       cema: DEBUG
     org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

@@ -26,7 +26,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -70,7 +69,7 @@ public class AuthenticationController {
     @PostMapping(value = "/users", produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<User> getUserDataFromToken(@RequestHeader("Authorization") String token) {
         LOG.info("Request for token {}", token);
-        if(StringUtils.hasText(token) && token.startsWith(Constants.BEARER_PREFIX)) {
+        if (StringUtils.hasText(token) && token.startsWith(Constants.BEARER_PREFIX)) {
             token = token.substring(7);
             String userName = tokenServiceImpl.getUsernameFromToken(token);
 

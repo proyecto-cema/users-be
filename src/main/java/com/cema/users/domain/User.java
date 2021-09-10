@@ -2,8 +2,8 @@ package com.cema.users.domain;
 
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 public class User {
@@ -26,6 +26,7 @@ public class User {
     private String email;
     @ApiModelProperty(notes = "The role of this user", example = "admin")
     @NotEmpty(message = "Role name is required")
+    @Pattern(regexp = "(?i)admin|peon|patron")
     private String role;
     @ApiModelProperty(notes = "When was this user created", hidden = true)
     private Date creationDate;

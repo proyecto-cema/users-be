@@ -1,6 +1,6 @@
 package com.cema.users.exceptions;
 
-public class InvalidCredentialsException extends RuntimeException{
+public class InvalidCredentialsException extends RuntimeException {
     public InvalidCredentialsException() {
     }
 

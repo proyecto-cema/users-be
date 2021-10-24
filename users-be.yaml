@@ -27,9 +27,9 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: 150m
+            cpu: 100m
           limits:
-            cpu: 250m
+            cpu: 200m
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: $ENV

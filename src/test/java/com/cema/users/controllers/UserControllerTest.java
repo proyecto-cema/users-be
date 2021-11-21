@@ -3,12 +3,13 @@ package com.cema.users.controllers;
 import com.cema.users.constants.Roles;
 import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
+import com.cema.users.exceptions.AlreadyExistsException;
+import com.cema.users.exceptions.NotFoundException;
 import com.cema.users.exceptions.UnauthorizedException;
-import com.cema.users.exceptions.UserExistsException;
-import com.cema.users.exceptions.UserNotFoundException;
 import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.authorization.AuthorizationService;
+import com.cema.users.services.validation.UserValidationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -34,6 +35,8 @@ public class UserControllerTest {
     private UserMapping userMapping;
     @Mock
     private AuthorizationService authorizationService;
+    @Mock
+    private UserValidationService userValidationService;
 
     private UserController userController;
 
@@ -44,7 +47,7 @@ public class UserControllerTest {
         openMocks(this);
         when(authorizationService.isOnTheSameEstablishment(cuig)).thenReturn(true);
         when(authorizationService.getCurrentUserCuig()).thenReturn(cuig);
-        userController = new UserController(cemaUserRepository, userMapping, authorizationService);
+        userController = new UserController(cemaUserRepository, userMapping, authorizationService, userValidationService);
     }
 
     @Test
@@ -74,7 +77,7 @@ public class UserControllerTest {
         when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(cemaUser);
         when(userMapping.mapEntityToDomain(cemaUser)).thenReturn(user);
 
-        Exception exception = assertThrows(UserNotFoundException.class, () -> {
+        Exception exception = assertThrows(NotFoundException.class, () -> {
             userController.lookUpUser("otheruser");
         });
         String resultingMessage = exception.getMessage();
@@ -152,7 +155,7 @@ public class UserControllerTest {
         when(userMapping.mapDomainToEntity(user, userName, password)).thenReturn(cemaUser);
 
 
-        Exception exception = assertThrows(UserExistsException.class, () -> {
+        Exception exception = assertThrows(AlreadyExistsException.class, () -> {
             userController.register(password, user);
         });
 
@@ -229,7 +232,7 @@ public class UserControllerTest {
         String userName = "merlin";
         when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(cemaUser);
 
-        Exception exception = assertThrows(UserNotFoundException.class, () -> {
+        Exception exception = assertThrows(NotFoundException.class, () -> {
             userController.delete("otherUser");
         });
 

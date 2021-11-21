@@ -5,7 +5,7 @@ import com.cema.users.domain.JwtResponse;
 import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
 import com.cema.users.exceptions.InvalidCredentialsException;
-import com.cema.users.exceptions.UserNotFoundException;
+import com.cema.users.exceptions.NotFoundException;
 import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.jwt.TokenService;
@@ -103,7 +103,7 @@ class AuthenticationUserControllerTest {
 
         when(tokenServiceImpl.getUsernameFromToken(token)).thenReturn(userName);
 
-        Assert.assertThrows("User userName doesn't exits", UserNotFoundException.class, () -> authenticationController.getUserDataFromToken(prefix + token));
+        Assert.assertThrows("User userName doesn't exits", NotFoundException.class, () -> authenticationController.getUserDataFromToken(prefix + token));
     }
 
     @Test

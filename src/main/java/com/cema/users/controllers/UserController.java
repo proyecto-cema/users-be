@@ -4,12 +4,13 @@ import com.cema.users.constants.Messages;
 import com.cema.users.constants.Roles;
 import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
+import com.cema.users.exceptions.AlreadyExistsException;
+import com.cema.users.exceptions.NotFoundException;
 import com.cema.users.exceptions.UnauthorizedException;
-import com.cema.users.exceptions.UserExistsException;
-import com.cema.users.exceptions.UserNotFoundException;
 import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.authorization.AuthorizationService;
+import com.cema.users.services.validation.UserValidationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -48,11 +49,45 @@ public class UserController {
     private final CemaUserRepository cemaUserRepository;
     private final UserMapping userMapping;
     private final AuthorizationService authorizationService;
+    private final UserValidationService userValidationService;
 
-    public UserController(CemaUserRepository cemaUserRepository, UserMapping userMapping, AuthorizationService authorizationService) {
+    public UserController(CemaUserRepository cemaUserRepository, UserMapping userMapping,
+                          AuthorizationService authorizationService, UserValidationService userValidationService) {
         this.cemaUserRepository = cemaUserRepository;
         this.userMapping = userMapping;
         this.authorizationService = authorizationService;
+        this.userValidationService = userValidationService;
+    }
+
+    @ApiOperation(value = "Validate a user data by username", response = User.class)
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully found user"),
+            @ApiResponse(code = 404, message = "The user you were looking for is not found"),
+            @ApiResponse(code = 401, message = "You are not allowed to look for this user"),
+            @ApiResponse(code = 422, message = "Invalid user")
+    })
+    @GetMapping(value = BASE_URL + "validate/{username}", produces = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<Void> validateUser(
+            @ApiParam(
+                    value = "The username of the user we are looking for.",
+                    example = "merlinds")
+            @PathVariable("username") String userName) {
+
+        userName = userName.toLowerCase();
+        LOG.info("Request for user {}", userName);
+
+        CemaUser cemaUser = cemaUserRepository.findCemaUserByUserName(userName);
+        if (cemaUser == null) {
+            throw new NotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
+        }
+        if (!authorizationService.isOnTheSameEstablishment(cemaUser.getEstablishmentCuig())) {
+            throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, cemaUser.getEstablishmentCuig()));
+        }
+        User user = userMapping.mapEntityToDomain(cemaUser);
+
+        userValidationService.validateUserForUsage(user);
+
+        return ResponseEntity.noContent().build();
     }
 
     @ApiOperation(value = "Retrieve a user data by username", response = User.class)
@@ -72,7 +107,7 @@ public class UserController {
 
         CemaUser cemaUser = cemaUserRepository.findCemaUserByUserName(userName);
         if (cemaUser == null) {
-            throw new UserNotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
+            throw new NotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
         }
         if (!authorizationService.isOnTheSameEstablishment(cemaUser.getEstablishmentCuig())) {
             throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, cemaUser.getEstablishmentCuig()));
@@ -105,14 +140,14 @@ public class UserController {
         if (!authorizationService.isOnTheSameEstablishment(user.getEstablishmentCuig())) {
             throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, user.getEstablishmentCuig()));
         }
-        if(!authorizationService.isAdmin() && user.getRole().equalsIgnoreCase(Roles.ADMIN)){
+        if (!authorizationService.isAdmin() && user.getRole().equalsIgnoreCase(Roles.ADMIN)) {
             throw new UnauthorizedException(String.format(Messages.ACTION_NOT_ALLOWED, user.getRole()));
         }
 
         CemaUser cemaUser = cemaUserRepository.findCemaUserByUserName(userName);
         if (cemaUser != null) {
             LOG.info("User already exists");
-            throw new UserExistsException(String.format(Messages.USER_ALREADY_EXISTS, userName));
+            throw new AlreadyExistsException(String.format(Messages.USER_ALREADY_EXISTS, userName));
         }
         cemaUser = userMapping.mapDomainToEntity(user, userName, password);
 
@@ -147,7 +182,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         LOG.info("Not found");
-        throw new UserNotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
+        throw new NotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
     }
 
     @PreAuthorize("hasRole('PATRON')")
@@ -173,7 +208,7 @@ public class UserController {
                 .collect(Collectors.toList());
 
         //If the user is not admin we filter out external users
-        if(!authorizationService.isAdmin()){
+        if (!authorizationService.isAdmin()) {
             mappedUsers = mappedUsers.stream()
                     .filter(user -> user.getEstablishmentCuig().equals(currentCuig))
                     .collect(Collectors.toList());

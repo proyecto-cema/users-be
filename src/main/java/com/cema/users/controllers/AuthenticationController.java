@@ -7,7 +7,7 @@ import com.cema.users.domain.JwtResponse;
 import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
 import com.cema.users.exceptions.InvalidCredentialsException;
-import com.cema.users.exceptions.UserNotFoundException;
+import com.cema.users.exceptions.NotFoundException;
 import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.jwt.TokenService;
@@ -75,7 +75,7 @@ public class AuthenticationController {
 
             CemaUser cemaUser = cemaUserRepository.findCemaUserByUserName(userName);
             if (cemaUser == null) {
-                throw new UserNotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
+                throw new NotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
             }
             User user = userMapping.mapEntityToDomain(cemaUser);
             LOG.info("Returning user: {}", user);

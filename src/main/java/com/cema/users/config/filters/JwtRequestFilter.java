@@ -62,7 +62,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 CemaUserDetails userDetails = (CemaUserDetails) userDetailsServiceImpl.loadUserByUsername(username);
 
                 if (tokenServiceImpl.validateToken(jwtToken, userDetails)) {
-
+                    userDetails.setAuthToken(requestTokenHeader);
                     UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     usernamePasswordAuthenticationToken

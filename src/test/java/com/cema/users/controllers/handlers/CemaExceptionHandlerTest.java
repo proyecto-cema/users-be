@@ -3,8 +3,8 @@ package com.cema.users.controllers.handlers;
 import com.cema.users.domain.ErrorResponse;
 import com.cema.users.exceptions.InvalidCredentialsException;
 import com.cema.users.exceptions.UnauthorizedException;
-import com.cema.users.exceptions.UserExistsException;
-import com.cema.users.exceptions.UserNotFoundException;
+import com.cema.users.exceptions.AlreadyExistsException;
+import com.cema.users.exceptions.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -42,7 +42,7 @@ class CemaExceptionHandlerTest {
     public void handleUserNotFoundExceptionShouldReturnResponseEntityWithMessageAndStatusCode() {
         CemaExceptionHandler cemaExceptionHandler = new CemaExceptionHandler();
 
-        UserNotFoundException ex = new UserNotFoundException("User pepito Not Found");
+        NotFoundException ex = new NotFoundException("User pepito Not Found");
 
         ResponseEntity<Object> result = cemaExceptionHandler.handleUserNotFoundException(ex, webRequest);
         ErrorResponse body = (ErrorResponse) result.getBody();
@@ -70,7 +70,7 @@ class CemaExceptionHandlerTest {
     public void handleUserExistsExceptionShouldReturnResponseEntityWithMessageAndStatusCode() {
         CemaExceptionHandler cemaExceptionHandler = new CemaExceptionHandler();
 
-        UserExistsException ex = new UserExistsException("User pepito already exists");
+        AlreadyExistsException ex = new AlreadyExistsException("User pepito already exists");
 
         ResponseEntity<Object> result = cemaExceptionHandler.handleUserExistsException(ex, webRequest);
         ErrorResponse body = (ErrorResponse) result.getBody();

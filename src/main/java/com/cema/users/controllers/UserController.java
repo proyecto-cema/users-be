@@ -11,6 +11,7 @@ import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.authorization.AuthorizationService;
 import com.cema.users.services.validation.UserValidationService;
+import com.cema.users.services.validation.administration.AdministrationClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -50,13 +51,16 @@ public class UserController {
     private final UserMapping userMapping;
     private final AuthorizationService authorizationService;
     private final UserValidationService userValidationService;
+    private final AdministrationClientService administrationClientService;
 
     public UserController(CemaUserRepository cemaUserRepository, UserMapping userMapping,
-                          AuthorizationService authorizationService, UserValidationService userValidationService) {
+                          AuthorizationService authorizationService, UserValidationService userValidationService,
+                          AdministrationClientService administrationClientService) {
         this.cemaUserRepository = cemaUserRepository;
         this.userMapping = userMapping;
         this.authorizationService = authorizationService;
         this.userValidationService = userValidationService;
+        this.administrationClientService = administrationClientService;
     }
 
     @ApiOperation(value = "Validate a user data by username", response = User.class)
@@ -109,9 +113,15 @@ public class UserController {
         if (cemaUser == null) {
             throw new NotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
         }
+
         if (!authorizationService.isOnTheSameEstablishment(cemaUser.getEstablishmentCuig())) {
             throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, cemaUser.getEstablishmentCuig()));
         }
+
+        String cuig = cemaUser.getEstablishmentCuig();
+
+        administrationClientService.validateEstablishment(cuig);
+
         User user = userMapping.mapEntityToDomain(cemaUser);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -136,9 +146,12 @@ public class UserController {
         String userName = user.getUserName().toLowerCase();
         user.setUserName(userName);
         LOG.info("Request to register user: {}", userName);
+        String cuig = user.getEstablishmentCuig();
+
+        administrationClientService.validateEstablishment(cuig);
 
         if (!authorizationService.isOnTheSameEstablishment(user.getEstablishmentCuig())) {
-            throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, user.getEstablishmentCuig()));
+            throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, cuig));
         }
         if (!authorizationService.isAdmin() && user.getRole().equalsIgnoreCase(Roles.ADMIN)) {
             throw new UnauthorizedException(String.format(Messages.ACTION_NOT_ALLOWED, user.getRole()));
@@ -177,6 +190,9 @@ public class UserController {
             if (!authorizationService.isOnTheSameEstablishment(cemaUser.getEstablishmentCuig())) {
                 throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, cemaUser.getEstablishmentCuig()));
             }
+            String cuig = cemaUser.getEstablishmentCuig();
+
+            administrationClientService.validateEstablishment(cuig);
             LOG.info("User exists, deleting");
             cemaUserRepository.delete(cemaUser);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

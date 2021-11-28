@@ -9,6 +9,7 @@ import com.cema.users.exceptions.NotFoundException;
 import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.jwt.TokenService;
+import com.cema.users.services.validation.administration.AdministrationClientService;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -97,6 +97,8 @@ public class AuthenticationController {
         authenticate(userName, authenticationRequest.getPassword());
 
         CemaUser cemaUser = cemaUserRepository.findCemaUserByUserName(userName);
+        String cuig = cemaUser.getEstablishmentCuig();
+
         User user = userMapping.mapEntityToDomain(cemaUser);
         UserDetails userDetails = userDetailsServiceImpl
                 .loadUserByUsername(userName);

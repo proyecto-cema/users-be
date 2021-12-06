@@ -5,6 +5,7 @@ import com.cema.users.exceptions.InvalidCredentialsException;
 import com.cema.users.exceptions.UnauthorizedException;
 import com.cema.users.exceptions.AlreadyExistsException;
 import com.cema.users.exceptions.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -27,6 +28,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
+@Slf4j
 class CemaExceptionHandlerTest {
 
     @Mock

@@ -10,6 +10,7 @@ import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.authorization.AuthorizationService;
 import com.cema.users.services.validation.UserValidationService;
+import com.cema.users.services.validation.administration.AdministrationClientService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -37,6 +38,8 @@ public class UserControllerTest {
     private AuthorizationService authorizationService;
     @Mock
     private UserValidationService userValidationService;
+    @Mock
+    private AdministrationClientService administrationClientService;
 
     private UserController userController;
 
@@ -47,7 +50,8 @@ public class UserControllerTest {
         openMocks(this);
         when(authorizationService.isOnTheSameEstablishment(cuig)).thenReturn(true);
         when(authorizationService.getCurrentUserCuig()).thenReturn(cuig);
-        userController = new UserController(cemaUserRepository, userMapping, authorizationService, userValidationService);
+        userController = new UserController(cemaUserRepository, userMapping, authorizationService, userValidationService,
+                administrationClientService);
     }
 
     @Test

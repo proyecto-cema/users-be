@@ -1,11 +1,13 @@
 package com.cema.users.services.validation.administration.impl;
 
 import com.cema.users.domain.ErrorResponse;
+import com.cema.users.domain.audit.Audit;
 import com.cema.users.exceptions.ValidationException;
 import com.cema.users.services.authorization.AuthorizationService;
 import com.cema.users.services.validation.administration.AdministrationClientService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,9 +18,11 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@Slf4j
 public class AdministrationClientServiceImpl implements AdministrationClientService {
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String PATH_VALIDATE_ESTABLISHMENT = "establishment/validate/{cuig}";
+    private static final String PATH_AUDIT = "audit/";
 
     private final RestTemplate restTemplate;
     private final String url;
@@ -48,5 +52,21 @@ public class AdministrationClientServiceImpl implements AdministrationClientServ
             ErrorResponse errorResponse = mapper.readValue(response, ErrorResponse.class);
             throw new ValidationException("Error validating establishment: " + errorResponse.getMessage(), httpClientErrorException);
         }
+    }
+
+    @Override
+    public void sendAuditRequest(Audit audit) {
+        String authToken = authorizationService.getUserAuthToken();
+        String auditUrl = url + PATH_AUDIT;
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(AUTHORIZATION_HEADER, authToken);
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Audit> entity = new HttpEntity<>(audit, httpHeaders);
+        try {
+            restTemplate.exchange(auditUrl, HttpMethod.POST, entity, Void.class);
+        } catch (Exception exception) {
+            log.error("Error sending audit request.", exception);
+        }
+
     }
 }

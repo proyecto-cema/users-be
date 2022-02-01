@@ -11,6 +11,7 @@ import com.cema.users.exceptions.NotFoundException;
 import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.jwt.TokenService;
+import com.cema.users.services.validation.administration.AdministrationClientService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -53,12 +54,17 @@ public class AuthenticationController {
 
     private final UserMapping userMapping;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, TokenService tokenServiceImpl, UserDetailsService userDetailsServiceImpl, CemaUserRepository cemaUserRepository, UserMapping userMapping) {
+    private final AdministrationClientService administrationClientService;
+
+    public AuthenticationController(AuthenticationManager authenticationManager, TokenService tokenServiceImpl,
+                                    UserDetailsService userDetailsServiceImpl, CemaUserRepository cemaUserRepository,
+                                    UserMapping userMapping, AdministrationClientService administrationClientService) {
         this.authenticationManager = authenticationManager;
         this.tokenServiceImpl = tokenServiceImpl;
         this.userDetailsServiceImpl = userDetailsServiceImpl;
         this.cemaUserRepository = cemaUserRepository;
         this.userMapping = userMapping;
+        this.administrationClientService = administrationClientService;
     }
 
     @ApiOperation(value = "Retrieve a user data by jwt token", response = User.class)
@@ -104,6 +110,8 @@ public class AuthenticationController {
                 .loadUserByUsername(userName);
 
         String token = tokenServiceImpl.generateToken(userDetails);
+
+        administrationClientService.validateEstablishment(cuig, "Bearer " + token);
         LOG.info("Returning token: {}", token);
         return ResponseEntity.ok(new JwtResponse(token, user));
     }

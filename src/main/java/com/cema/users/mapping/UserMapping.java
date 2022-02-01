@@ -7,4 +7,6 @@ public interface UserMapping {
     User mapEntityToDomain(CemaUser cemaUser);
 
     CemaUser mapDomainToEntity(User user, String userName, String password);
+
+    CemaUser updateEntity(User user, CemaUser cemaUser);
 }

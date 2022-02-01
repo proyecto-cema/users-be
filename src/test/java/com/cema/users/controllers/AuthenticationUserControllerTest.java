@@ -46,6 +46,8 @@ class AuthenticationUserControllerTest {
     private CemaUserRepository cemaUserRepository;
     @Mock
     private UserMapping userMapping;
+    @Mock
+    private AdministrationClientService administrationClientService;
 
     private AuthenticationController authenticationController;
 
@@ -53,7 +55,7 @@ class AuthenticationUserControllerTest {
     public void setUp() {
         openMocks(this);
         authenticationController = new AuthenticationController(authenticationManager, tokenServiceImpl,
-                userDetailsServiceImpl, cemaUserRepository, userMapping);
+                userDetailsServiceImpl, cemaUserRepository, userMapping, administrationClientService);
     }
 
     @Test

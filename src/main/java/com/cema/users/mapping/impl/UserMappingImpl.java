@@ -5,6 +5,7 @@ import com.cema.users.entities.CemaUser;
 import com.cema.users.mapping.UserMapping;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 
@@ -44,6 +45,21 @@ public class UserMappingImpl implements UserMapping {
         cemaUser.setRole(user.getRole().toUpperCase());
         cemaUser.setCreationDate(new Date());
         cemaUser.setPassword(bcryptEncoder.encode(password));
+
+        return cemaUser;
+    }
+
+    @Override
+    public CemaUser updateEntity(User user, CemaUser cemaUser) {
+        String name = StringUtils.hasText(user.getName()) ? user.getName() : cemaUser.getName();
+        String lastName = StringUtils.hasText(user.getLastName()) ? user.getLastName() : cemaUser.getLastName();
+        String email = StringUtils.hasText(user.getEmail()) ? user.getEmail() : cemaUser.getEmail();
+        String phone = StringUtils.hasText(user.getPhone()) ? user.getPhone() : cemaUser.getPhone();
+
+        cemaUser.setName(name);
+        cemaUser.setLastName(lastName);
+        cemaUser.setEmail(email);
+        cemaUser.setPhone(phone);
 
         return cemaUser;
     }

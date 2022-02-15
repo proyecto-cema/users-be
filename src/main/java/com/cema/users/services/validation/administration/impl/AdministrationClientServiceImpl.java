@@ -38,11 +38,10 @@ public class AdministrationClientServiceImpl implements AdministrationClientServ
 
     @SneakyThrows
     @Override
-    public void validateEstablishment(String cuig) {
-        String authToken = authorizationService.getUserAuthToken();
+    public void validateEstablishment(String cuig, String token) {
         String searchUrl = url + PATH_VALIDATE_ESTABLISHMENT;
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(AUTHORIZATION_HEADER, authToken);
+        httpHeaders.add(AUTHORIZATION_HEADER, token);
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity entity = new HttpEntity("{}", httpHeaders);
         try {
@@ -67,6 +66,5 @@ public class AdministrationClientServiceImpl implements AdministrationClientServ
         } catch (Exception exception) {
             log.error("Error sending audit request.", exception);
         }
-
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -120,8 +121,6 @@ public class UserController {
 
         String cuig = cemaUser.getEstablishmentCuig();
 
-        administrationClientService.validateEstablishment(cuig);
-
         User user = userMapping.mapEntityToDomain(cemaUser);
 
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -148,8 +147,6 @@ public class UserController {
         LOG.info("Request to register user: {}", userName);
         String cuig = user.getEstablishmentCuig();
 
-        administrationClientService.validateEstablishment(cuig);
-
         if (!authorizationService.isOnTheSameEstablishment(user.getEstablishmentCuig())) {
             throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, cuig));
         }
@@ -167,6 +164,43 @@ public class UserController {
         cemaUserRepository.save(cemaUser);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Register a new user to the database")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "User created successfully"),
+            @ApiResponse(code = 409, message = "The user you were trying to create already exists"),
+            @ApiResponse(code = 401, message = "You are not allowed to register this user")
+    })
+    @PutMapping(value = BASE_URL + "{username}", produces = {MediaType.APPLICATION_JSON_VALUE}, consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<User> updateUser(
+            @ApiParam(
+                    value = "The username of the user we are looking for.",
+                    example = "merlinds")
+            @PathVariable("username") String username,
+            @ApiParam(
+                    value = "The user data we are trying to insert.")
+            @RequestBody  User user) {
+        String userName = user.getUserName().toLowerCase();
+        user.setUserName(userName);
+        LOG.info("Request to update user: {}", userName);
+
+        if (!authorizationService.isOnTheSameEstablishment(user.getEstablishmentCuig())) {
+            throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, user.getEstablishmentCuig()));
+        }
+        if (!authorizationService.isAdmin() && user.getRole().equalsIgnoreCase(Roles.ADMIN)) {
+            throw new UnauthorizedException(String.format(Messages.ACTION_NOT_ALLOWED, user.getRole()));
+        }
+
+        CemaUser cemaUser = cemaUserRepository.findCemaUserByUserName(userName);
+        if (cemaUser == null) {
+            throw new NotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
+        }
+        cemaUser = userMapping.updateEntity(user, cemaUser);
+
+        CemaUser cemaUserUpdated = cemaUserRepository.save(cemaUser);
+
+        return ResponseEntity.ok(userMapping.mapEntityToDomain(cemaUserUpdated));
     }
 
     @PreAuthorize("hasRole('PATRON')")
@@ -190,9 +224,6 @@ public class UserController {
             if (!authorizationService.isOnTheSameEstablishment(cemaUser.getEstablishmentCuig())) {
                 throw new UnauthorizedException(String.format(Messages.OUTSIDE_ESTABLISHMENT, cemaUser.getEstablishmentCuig()));
             }
-            String cuig = cemaUser.getEstablishmentCuig();
-
-            administrationClientService.validateEstablishment(cuig);
             LOG.info("User exists, deleting");
             cemaUserRepository.delete(cemaUser);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -2,6 +2,8 @@ package com.cema.users.services.jwt.impl;
 
 import com.cema.users.domain.CemaUserDetails;
 import com.cema.users.entities.CemaUser;
+import com.cema.users.exceptions.UserDisabledException;
+import com.cema.users.exceptions.ValidationException;
 import com.cema.users.repositories.CemaUserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +27,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         CemaUser user = cemaUserRepository.findCemaUserByUserName(username);
         if (user == null) {
             throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        if(!user.getEnabled()){
+            throw new UserDisabledException("User not enabled");
         }
         GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(user.getRole().toUpperCase());
 

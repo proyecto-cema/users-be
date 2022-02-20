@@ -5,6 +5,7 @@ import com.cema.users.exceptions.InvalidCredentialsException;
 import com.cema.users.exceptions.UnauthorizedException;
 import com.cema.users.exceptions.AlreadyExistsException;
 import com.cema.users.exceptions.NotFoundException;
+import com.cema.users.exceptions.UserDisabledException;
 import com.cema.users.exceptions.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,14 @@ public class CemaExceptionHandler {
         ErrorResponse error = new ErrorResponse(ex.getMessage(), request.toString());
         return new ResponseEntity(error, HttpStatus.CONFLICT);
     }
+    @ExceptionHandler(UserDisabledException.class)
+    public final ResponseEntity<Object> handleUserDisabledException(UserDisabledException ex, WebRequest request) {
+        log.error("Exception while processing.", ex);
+
+        ErrorResponse error = new ErrorResponse(ex.getMessage(), request.toString());
+        return new ResponseEntity(error, HttpStatus.CONFLICT);
+    }
+
 
     @ExceptionHandler(UnauthorizedException.class)
     public final ResponseEntity<Object> handleUnauthorizedException(UnauthorizedException ex, WebRequest request) {

@@ -8,6 +8,7 @@ import com.cema.users.domain.User;
 import com.cema.users.entities.CemaUser;
 import com.cema.users.exceptions.InvalidCredentialsException;
 import com.cema.users.exceptions.NotFoundException;
+import com.cema.users.exceptions.UserDisabledException;
 import com.cema.users.mapping.UserMapping;
 import com.cema.users.repositories.CemaUserRepository;
 import com.cema.users.services.jwt.TokenService;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -119,6 +121,9 @@ public class AuthenticationController {
     private void authenticate(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+        } catch (InternalAuthenticationServiceException use) {
+            LOG.error("Error authenticating disabled user", use);
+            throw new UserDisabledException("User disabled.");
         } catch (Exception e) {
             LOG.error("Error while authenticating user", e);
             throw new InvalidCredentialsException("Invalid credentials", e);

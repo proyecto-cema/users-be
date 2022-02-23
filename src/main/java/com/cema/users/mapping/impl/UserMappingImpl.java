@@ -29,6 +29,7 @@ public class UserMappingImpl implements UserMapping {
         user.setPhone(cemaUser.getPhone());
         user.setRole(cemaUser.getRole());
         user.setCreationDate(cemaUser.getCreationDate());
+        user.setEnabled(cemaUser.getEnabled());
 
         return user;
     }
@@ -45,6 +46,7 @@ public class UserMappingImpl implements UserMapping {
         cemaUser.setRole(user.getRole().toUpperCase());
         cemaUser.setCreationDate(new Date());
         cemaUser.setPassword(bcryptEncoder.encode(password));
+        cemaUser.setEnabled(user.getEnabled() != null ? user.getEnabled() : true);
 
         return cemaUser;
     }
@@ -55,11 +57,13 @@ public class UserMappingImpl implements UserMapping {
         String lastName = StringUtils.hasText(user.getLastName()) ? user.getLastName() : cemaUser.getLastName();
         String email = StringUtils.hasText(user.getEmail()) ? user.getEmail() : cemaUser.getEmail();
         String phone = StringUtils.hasText(user.getPhone()) ? user.getPhone() : cemaUser.getPhone();
+        Boolean enabled = user.getEnabled() != null ? user.getEnabled() : cemaUser.getEnabled();
 
         cemaUser.setName(name);
         cemaUser.setLastName(lastName);
         cemaUser.setEmail(email);
         cemaUser.setPhone(phone);
+        cemaUser.setEnabled(enabled);
 
         return cemaUser;
     }

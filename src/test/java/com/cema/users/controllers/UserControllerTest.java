@@ -268,11 +268,15 @@ public class UserControllerTest {
         String otherCuig = "00";
 
         CemaUser cemaUser1 = new CemaUser();
+        cemaUser1.setUserName("user1");
         User user1 = new User();
+        user1.setUserName("user1");
         user1.setEstablishmentCuig(otherCuig);
 
         CemaUser cemaUser2 = new CemaUser();
+        cemaUser2.setUserName("user2");
         User user2 = new User();
+        user2.setUserName("user2");
         user2.setEstablishmentCuig(cuig);
 
 
@@ -301,12 +305,16 @@ public class UserControllerTest {
         String otherCuig = "00";
 
         CemaUser cemaUser1 = new CemaUser();
+        cemaUser1.setUserName("user1");
         User user1 = new User();
-        user1.setEstablishmentCuig(cuig);
+        user1.setUserName("user1");
+        user1.setEstablishmentCuig(otherCuig);
 
         CemaUser cemaUser2 = new CemaUser();
+        cemaUser2.setUserName("user2");
         User user2 = new User();
-        user2.setEstablishmentCuig(otherCuig);
+        user2.setUserName("user2");
+        user2.setEstablishmentCuig(cuig);
 
         List<CemaUser> cemaUsers = Arrays.asList(cemaUser1, cemaUser2);
 
@@ -319,8 +327,8 @@ public class UserControllerTest {
 
         List<User> resultingUsers = result.getBody();
 
-        assertTrue(resultingUsers.contains(user1));
-        assertFalse(resultingUsers.contains(user2));
+        assertTrue(resultingUsers.contains(user2));
+        assertFalse(resultingUsers.contains(user1));
         HttpStatus resultingStatus = result.getStatusCode();
 
         assertThat(resultingStatus, is(HttpStatus.OK));

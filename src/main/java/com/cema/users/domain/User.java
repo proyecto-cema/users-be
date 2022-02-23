@@ -2,19 +2,20 @@ package com.cema.users.domain;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import java.util.Date;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Comparable<User>{
 
     @ApiModelProperty(notes = "The cuig of the establishment this user belongs to", example = "312")
     @NotEmpty(message = "Establishment is required")
@@ -40,6 +41,8 @@ public class User {
     private String role;
     @ApiModelProperty(notes = "When was this user created", hidden = true)
     private Date creationDate;
+    @ApiModelProperty(notes = "If this user is enabled to use the system", example = "true")
+    private Boolean enabled;
 
     @Override
     public String toString() {
@@ -52,5 +55,10 @@ public class User {
                 ", role='" + role + '\'' +
                 ", creationDate=" + creationDate +
                 '}';
+    }
+
+    @Override
+    public int compareTo(@NotNull User o) {
+        return userName.compareTo(o.getUserName());
     }
 }

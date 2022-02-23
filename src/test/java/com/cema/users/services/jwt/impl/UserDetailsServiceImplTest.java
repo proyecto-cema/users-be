@@ -46,6 +46,7 @@ class UserDetailsServiceImplTest {
         user.setUserName(userName);
         user.setPassword(password);
         user.setRole(role);
+        user.setEnabled(true);
 
         when(cemaUserRepository.findCemaUserByUserName(userName)).thenReturn(user);
 

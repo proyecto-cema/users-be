@@ -232,7 +232,6 @@ public class UserController {
         throw new NotFoundException(String.format(Messages.USER_DOES_NOT_EXISTS, userName));
     }
 
-    @PreAuthorize("hasRole('PATRON')")
     @ApiOperation(value = "Retrieve a list of users with the specified role", response = User.class, responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully found user")
@@ -246,11 +245,11 @@ public class UserController {
 
         LOG.info("Searching users with role {}", role);
 
-        List<CemaUser> bovineList = cemaUserRepository.findCemaUsersByRoleIgnoreCase(role);
-        LOG.info("Returned {} users from db", bovineList.size());
+        List<CemaUser> users = cemaUserRepository.findCemaUsersByRoleIgnoreCase(role);
+        LOG.info("Returned {} users from db", users.size());
         String currentCuig = authorizationService.getCurrentUserCuig();
 
-        List<User> mappedUsers = bovineList.stream()
+        List<User> mappedUsers = users.stream()
                 .map(userMapping::mapEntityToDomain)
                 .collect(Collectors.toList());
 
@@ -260,6 +259,8 @@ public class UserController {
                     .filter(user -> user.getEstablishmentCuig().equals(currentCuig))
                     .collect(Collectors.toList());
         }
+
+        mappedUsers.sort(null);
 
         return ResponseEntity.ok().body(mappedUsers);
     }
